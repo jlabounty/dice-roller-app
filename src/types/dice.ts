@@ -31,6 +31,8 @@ export interface DiceGroupResult {
   allRolls: number[]
   /** Indices from allRolls that were dropped (for strikethrough display) */
   droppedIndices: Set<number>
+  /** Indices that are extra dice produced by an explode modifier */
+  explodedIndices: Set<number>
   /** Sum of kept dice */
   subtotal: number
 }

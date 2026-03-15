@@ -62,6 +62,7 @@ function rollGroup(
 
   // Apply exploding modifiers — these ADD entries to allRolls
   const allRolls: number[] = [...baseRolls]
+  const explodedIndices = new Set<number>()
 
   const explodeMod = modifiers.find(
     (m) => m.type === 'explode' || m.type === 'explodeCompound' || m.type === 'explodePenetrating',
@@ -70,7 +71,7 @@ function rollGroup(
   if (explodeMod) {
     const max = maxSides(dieType)
     if (explodeMod.type === 'explodeCompound') {
-      // Accumulate into a single die value per original die
+      // Accumulate into a single die value per original die; mark that die as exploded
       for (let i = 0; i < baseRolls.length; i++) {
         let extra = baseRolls[i]
         let accumulated = extra
@@ -80,10 +81,11 @@ function rollGroup(
           accumulated += extra
           attempts++
         }
+        if (accumulated !== baseRolls[i]) explodedIndices.add(i)
         allRolls[i] = accumulated
       }
     } else {
-      // explode / explodePenetrating: add extra dice
+      // explode / explodePenetrating: add extra dice as new entries
       const penetrate = explodeMod.type === 'explodePenetrating'
       for (let i = 0; i < baseRolls.length; i++) {
         let prev = baseRolls[i]
@@ -91,6 +93,7 @@ function rollGroup(
         while (prev === max && attempts < MAX_EXPLODE) {
           let extra = rollDie(dieType, random)
           if (penetrate) extra -= 1
+          explodedIndices.add(allRolls.length)
           allRolls.push(extra)
           prev = extra + (penetrate ? 1 : 0)
           attempts++
@@ -148,7 +151,7 @@ function rollGroup(
     return droppedIndices.has(idx) ? sum : sum + v
   }, 0)
 
-  return { dieType, allRolls: finalRolls, droppedIndices, subtotal }
+  return { dieType, allRolls: finalRolls, droppedIndices, explodedIndices, subtotal }
 }
 
 function evalExpr(

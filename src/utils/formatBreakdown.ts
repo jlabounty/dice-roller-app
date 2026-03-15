@@ -9,6 +9,7 @@ function dieLabel(dt: DieType): string {
 export interface BreakdownPart {
   text: string
   dropped: boolean
+  exploded: boolean
 }
 
 export interface GroupBreakdown {
@@ -22,6 +23,7 @@ export function formatResult(result: RollResult): { groups: GroupBreakdown[]; to
     const parts: BreakdownPart[] = g.allRolls.map((v, idx) => ({
       text: String(v),
       dropped: g.droppedIndices.has(idx),
+      exploded: g.explodedIndices.has(idx),
     }))
     return {
       label: `${g.allRolls.length}${dieLabel(g.dieType)}`,

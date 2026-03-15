@@ -50,7 +50,7 @@ export function RollResultOverlay() {
                 <span key={pi}>
                   {pi > 0 && <span className="text-white/50">, </span>}
                   <span className={p.dropped ? 'line-through text-white/40' : 'text-white'}>
-                    {p.text}
+                    {p.text}{p.exploded && !p.dropped && <span className="not-italic">💥</span>}
                   </span>
                 </span>
               ))}
