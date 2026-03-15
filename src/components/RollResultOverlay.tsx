@@ -7,7 +7,7 @@ export function RollResultOverlay() {
   const dismissResult = useDiceStore((s) => s.dismissResult)
   const formula = useDiceStore((s) => s.formula)
   const favorites = useDiceStore((s) => s.favorites)
-  const addFavorite = useDiceStore((s) => s.addFavorite)
+  const openSaveFavorite = useDiceStore((s) => s.openSaveFavorite)
   const removeFavorite = useDiceStore((s) => s.removeFavorite)
 
   if (!showResult || !rollResult) return null
@@ -20,7 +20,7 @@ export function RollResultOverlay() {
       const fav = favorites.find((f) => f.expression === formula)
       if (fav) removeFavorite(fav.id)
     } else {
-      addFavorite(formula, '')
+      openSaveFavorite(formula)
     }
   }
 

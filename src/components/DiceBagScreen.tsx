@@ -4,6 +4,7 @@ import { OperatorKeyGrid } from './OperatorKeyGrid'
 import { NumpadGrid } from './NumpadGrid'
 import { BottomBar } from './BottomBar'
 import { RollResultOverlay } from './RollResultOverlay'
+import { SaveFavoriteModal } from './SaveFavoriteModal'
 
 export function DiceBagScreen() {
   return (
@@ -15,6 +16,7 @@ export function DiceBagScreen() {
       <NumpadGrid />
       <BottomBar />
       <RollResultOverlay />
+      <SaveFavoriteModal />
     </div>
   )
 }

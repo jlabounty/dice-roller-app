@@ -40,6 +40,8 @@ interface DiceStore {
   parseError: string | null
   rollResult: RollResult | null
   showResult: boolean
+  /** Expression awaiting save-as-favorite (opens SaveFavoriteModal) */
+  pendingSaveFavorite: string | null
 
   history: RollResult[]
   favorites: Favorite[]
@@ -52,9 +54,13 @@ interface DiceStore {
   dismissResult: () => void
   loadExpression: (expression: string) => void
 
-  addFavorite: (expression: string, label: string) => void
+  openSaveFavorite: (expression: string) => void
+  closeSaveFavorite: () => void
+  addFavorite: (expression: string, label: string, category: string) => void
+  updateFavorite: (id: string, patch: Partial<Pick<Favorite, 'label' | 'category'>>) => void
   removeFavorite: (id: string) => void
   isFavorite: (expression: string) => boolean
+  rollFavorite: (id: string) => void
   deleteHistoryEntry: (id: string) => void
   clearHistory: () => void
 }
@@ -72,6 +78,7 @@ export const useDiceStore = create<DiceStore>()(
       parseError: null,
       rollResult: null,
       showResult: false,
+      pendingSaveFavorite: null,
       history: [],
       favorites: [],
 
@@ -111,14 +118,24 @@ export const useDiceStore = create<DiceStore>()(
         set({ formula: expression, parseError: validateFormula(expression), showResult: false })
       },
 
-      addFavorite: (expression, label) => {
+      openSaveFavorite: (expression) => set({ pendingSaveFavorite: expression }),
+      closeSaveFavorite: () => set({ pendingSaveFavorite: null }),
+
+      addFavorite: (expression, label, category) => {
         const fav: Favorite = {
           id: crypto.randomUUID(),
           expression,
           label,
+          category,
           createdAt: Date.now(),
         }
-        set((s) => ({ favorites: [...s.favorites, fav] }))
+        set((s) => ({ favorites: [...s.favorites, fav], pendingSaveFavorite: null }))
+      },
+
+      updateFavorite: (id, patch) => {
+        set((s) => ({
+          favorites: s.favorites.map((f) => f.id === id ? { ...f, ...patch } : f),
+        }))
       },
 
       removeFavorite: (id) => {
@@ -127,6 +144,22 @@ export const useDiceStore = create<DiceStore>()(
 
       isFavorite: (expression) => {
         return get().favorites.some((f) => f.expression === expression)
+      },
+
+      rollFavorite: (id) => {
+        const fav = get().favorites.find((f) => f.id === id)
+        if (!fav) return
+        const parseResult = parse(fav.expression)
+        if (!parseResult.ok) return
+        const result = evaluate(parseResult.expr, fav.expression)
+        const newHistory = [result, ...get().history].slice(0, 200)
+        set({
+          formula: fav.expression,
+          parseError: null,
+          rollResult: result,
+          showResult: true,
+          history: newHistory,
+        })
       },
 
       deleteHistoryEntry: (id) => {

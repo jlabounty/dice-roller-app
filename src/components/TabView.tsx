@@ -2,13 +2,15 @@ import { useState } from 'react'
 import { DiceBagScreen } from './DiceBagScreen'
 import { HistoryPanel } from './HistoryPanel'
 import { FavoritesPanel } from './FavoritesPanel'
+import { HelpScreen } from './HelpScreen'
 
-type Tab = 'bag' | 'history' | 'favorites'
+type Tab = 'bag' | 'history' | 'favorites' | 'help'
 
 const TABS: { id: Tab; label: string; icon: string }[] = [
-  { id: 'history', label: 'History', icon: '🕐' },
-  { id: 'bag', label: 'Dice Bag', icon: '🎲' },
+  { id: 'history',   label: 'History',   icon: '🕐' },
+  { id: 'bag',       label: 'Dice Bag',  icon: '🎲' },
   { id: 'favorites', label: 'Favorites', icon: '♥' },
+  { id: 'help',      label: 'Help',      icon: '?' },
 ]
 
 export function TabView() {
@@ -18,14 +20,17 @@ export function TabView() {
     <div className="flex flex-col h-full">
       {/* Content */}
       <div className="flex-1 overflow-hidden">
-        <div className={activeTab === 'bag' ? 'h-full' : 'hidden h-full'}>
+        <div className={activeTab === 'bag'       ? 'h-full' : 'hidden h-full'}>
           <DiceBagScreen />
         </div>
-        <div className={activeTab === 'history' ? 'h-full' : 'hidden h-full'}>
+        <div className={activeTab === 'history'   ? 'h-full' : 'hidden h-full'}>
           <HistoryPanel onLoadExpression={() => setActiveTab('bag')} />
         </div>
         <div className={activeTab === 'favorites' ? 'h-full' : 'hidden h-full'}>
-          <FavoritesPanel onLoadExpression={() => setActiveTab('bag')} />
+          <FavoritesPanel onRolled={() => setActiveTab('bag')} />
+        </div>
+        <div className={activeTab === 'help'      ? 'h-full' : 'hidden h-full'}>
+          <HelpScreen onExampleClick={() => setActiveTab('bag')} />
         </div>
       </div>
 

@@ -47,6 +47,7 @@ export interface Favorite {
   id: string
   expression: string
   label: string
+  category: string
   createdAt: number
 }
 

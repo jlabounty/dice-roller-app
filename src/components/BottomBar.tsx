@@ -6,7 +6,7 @@ export function BottomBar() {
   const formula = useDiceStore((s) => s.formula)
   const parseError = useDiceStore((s) => s.parseError)
   const favorites = useDiceStore((s) => s.favorites)
-  const addFavorite = useDiceStore((s) => s.addFavorite)
+  const openSaveFavorite = useDiceStore((s) => s.openSaveFavorite)
   const removeFavorite = useDiceStore((s) => s.removeFavorite)
   const isFav = formula ? favorites.some((f) => f.expression === formula) : false
 
@@ -18,7 +18,7 @@ export function BottomBar() {
       const fav = favorites.find((f) => f.expression === formula)
       if (fav) removeFavorite(fav.id)
     } else {
-      addFavorite(formula, '')
+      openSaveFavorite(formula)
     }
   }
 
