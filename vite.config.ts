@@ -3,6 +3,7 @@ import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 
 export default defineConfig({
+  base: '/dice-roller-app/',
   plugins: [
     react(),
     VitePWA({
@@ -16,7 +17,7 @@ export default defineConfig({
         background_color: '#1A1A2E',
         display: 'standalone',
         orientation: 'portrait',
-        start_url: '/',
+        start_url: '/dice-roller-app/',
         icons: [
           {
             src: '/icons/icon-192.png',
