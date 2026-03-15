@@ -31,8 +31,14 @@ export interface DiceGroupResult {
   allRolls: number[]
   /** Indices from allRolls that were dropped (for strikethrough display) */
   droppedIndices: Set<number>
-  /** Indices that are extra dice produced by an explode modifier */
-  explodedIndices: Set<number>
+  /**
+   * Maps each trigger die index → ordered list of extra die indices it produced.
+   * Only set for explode / explodePenetrating (not compound).
+   * Within each array, all entries except the last also triggered further explosions.
+   */
+  explodeChains: Map<number, number[]>
+  /** Indices of dice whose value was augmented by compound explode (!!). */
+  compoundExplodedIndices: Set<number>
   /** Sum of kept dice */
   subtotal: number
 }

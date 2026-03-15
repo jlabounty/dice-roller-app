@@ -46,12 +46,32 @@ export function RollResultOverlay() {
             <div key={gi} className="text-white/90 text-sm font-mono flex flex-wrap gap-x-1 justify-center">
               <span className="text-white/50">{g.label}:</span>
               <span>[</span>
-              {g.parts.map((p, pi) => (
-                <span key={pi}>
-                  {pi > 0 && <span className="text-white/50">, </span>}
-                  <span className={p.dropped ? 'line-through text-white/40' : 'text-white'}>
-                    {p.text}{p.exploded && !p.dropped && <span className="not-italic">💥</span>}
-                  </span>
+              {g.items.map((item, ii) => (
+                <span key={ii}>
+                  {ii > 0 && <span className="text-white/50">, </span>}
+                  {item.kind === 'single' ? (
+                    <span className={item.dropped ? 'line-through text-white/40' : 'text-white'}>
+                      {item.text}{item.compoundExploded && !item.dropped && '💥'}
+                    </span>
+                  ) : (
+                    /* Explosion chain: (trigger⚡ extra💥⚡ last💥) */
+                    <span className={item.dropped ? 'line-through text-white/40' : 'text-white'}>
+                      {'('}
+                      {item.members.map((m, mi) => (
+                        <span key={mi}>
+                          {mi > 0 && <span className="text-white/50"> </span>}
+                          {m.text}
+                          {mi === 0
+                            ? '🎆'                    /* triggering die */
+                            : m.isSubTrigger
+                              ? '💥🎆'               /* exploded and triggered another */
+                              : '💥'                 /* final exploded die */
+                          }
+                        </span>
+                      ))}
+                      {')'}
+                    </span>
+                  )}
                 </span>
               ))}
               <span>]</span>

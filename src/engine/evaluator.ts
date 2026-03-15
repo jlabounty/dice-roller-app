@@ -62,7 +62,8 @@ function rollGroup(
 
   // Apply exploding modifiers — these ADD entries to allRolls
   const allRolls: number[] = [...baseRolls]
-  const explodedIndices = new Set<number>()
+  const explodeChains = new Map<number, number[]>()
+  const compoundExplodedIndices = new Set<number>()
 
   const explodeMod = modifiers.find(
     (m) => m.type === 'explode' || m.type === 'explodeCompound' || m.type === 'explodePenetrating',
@@ -71,7 +72,7 @@ function rollGroup(
   if (explodeMod) {
     const max = maxSides(dieType)
     if (explodeMod.type === 'explodeCompound') {
-      // Accumulate into a single die value per original die; mark that die as exploded
+      // Accumulate into a single die value per original die
       for (let i = 0; i < baseRolls.length; i++) {
         let extra = baseRolls[i]
         let accumulated = extra
@@ -81,21 +82,23 @@ function rollGroup(
           accumulated += extra
           attempts++
         }
-        if (accumulated !== baseRolls[i]) explodedIndices.add(i)
+        if (accumulated !== baseRolls[i]) compoundExplodedIndices.add(i)
         allRolls[i] = accumulated
       }
     } else {
-      // explode / explodePenetrating: add extra dice as new entries
+      // explode / explodePenetrating: add extra dice as new entries, grouped per trigger
       const penetrate = explodeMod.type === 'explodePenetrating'
       for (let i = 0; i < baseRolls.length; i++) {
         let prev = baseRolls[i]
         let attempts = 0
-        while (prev === max && attempts < MAX_EXPLODE) {
+        while ((penetrate ? prev + 1 : prev) === max && attempts < MAX_EXPLODE) {
           let extra = rollDie(dieType, random)
           if (penetrate) extra -= 1
-          explodedIndices.add(allRolls.length)
+          const extraIdx = allRolls.length
           allRolls.push(extra)
-          prev = extra + (penetrate ? 1 : 0)
+          if (!explodeChains.has(i)) explodeChains.set(i, [])
+          explodeChains.get(i)!.push(extraIdx)
+          prev = extra
           attempts++
         }
       }
@@ -151,7 +154,7 @@ function rollGroup(
     return droppedIndices.has(idx) ? sum : sum + v
   }, 0)
 
-  return { dieType, allRolls: finalRolls, droppedIndices, explodedIndices, subtotal }
+  return { dieType, allRolls: finalRolls, droppedIndices, explodeChains, compoundExplodedIndices, subtotal }
 }
 
 function evalExpr(
