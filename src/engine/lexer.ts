@@ -5,6 +5,8 @@ export type Token =
   | { type: 'dpercentile' }              // d100 (alias, but also explicit)
   | { type: 'plus' }
   | { type: 'minus' }
+  | { type: 'lparen' }                   // (
+  | { type: 'rparen' }                   // )
   | { type: 'keepHighest' }              // kh / KH
   | { type: 'keepLowest' }               // kl / KL
   | { type: 'dropHighest' }              // dh / DH
@@ -51,9 +53,11 @@ export function tokenize(input: string): Token[] {
     // Single char !
     if (s[i] === '!') { tokens.push({ type: 'explode' }); i++; continue }
 
-    // + -
+    // + - ( )
     if (s[i] === '+') { tokens.push({ type: 'plus' }); i++; continue }
     if (s[i] === '-') { tokens.push({ type: 'minus' }); i++; continue }
+    if (s[i] === '(') { tokens.push({ type: 'lparen' }); i++; continue }
+    if (s[i] === ')') { tokens.push({ type: 'rparen' }); i++; continue }
 
     // Die notation: d / D followed by F, % or digits
     if (s[i].toLowerCase() === 'd') {

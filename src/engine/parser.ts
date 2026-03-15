@@ -62,6 +62,14 @@ class Parser {
       return this.parseDiceGroup(1)
     }
 
+    // Parenthesized expression
+    if (t.type === 'lparen') {
+      this.consume()
+      const inner = this.parseExpression()
+      this.expect('rparen')
+      return inner
+    }
+
     // Minus followed by number = negative constant
     if (t.type === 'minus') {
       this.consume()
@@ -94,7 +102,8 @@ class Parser {
         next.type === 'number' ||
         next.type === 'die' ||
         next.type === 'dfudge' ||
-        next.type === 'dpercentile'
+        next.type === 'dpercentile' ||
+        next.type === 'rparen'
       ) break
 
       if (next.type === 'keepHighest') {

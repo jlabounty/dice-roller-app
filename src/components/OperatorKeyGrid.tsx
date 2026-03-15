@@ -19,8 +19,8 @@ const KEYS: KeyDef[] = [
   { label: '≤',  token: '≤',  title: 'Less than or equal — use after r or f', example: '4d6r≤2' },
   { label: '≥',  token: '≥',  title: 'Greater than or equal — use after r or f', example: '2d6r≥5' },
   // Row 2
-  { label: 'kh', token: 'kh', title: 'Keep Highest (lowercase alias)', example: '4d6kh3' },
-  { label: 'kl', token: 'kl', title: 'Keep Lowest (lowercase alias)', example: '2d20kl1' },
+  { label: '(',  token: '(',  title: 'Open parenthesis — group parts of your formula', example: '(2d6+3)+1d4' },
+  { label: ')',  token: ')',  title: 'Close parenthesis — end a group', example: '(2d6+3)+1d4' },
   { label: 'r',  token: 'r',  title: 'Reroll (lowercase alias)', example: '2d6r1' },
   { label: '!!', token: '!!', title: 'Compound Explode — extra rolls accumulate on the same die', example: '2d6!!' },
   { label: '!p', token: '!p', title: 'Penetrating Explode — explode but subtract 1 from each extra roll', example: '2d6!p' },
