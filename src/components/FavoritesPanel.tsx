@@ -99,9 +99,13 @@ export function FavoritesPanel({ onRolled }: Props) {
             typeof f === 'object' &&
             f !== null &&
             typeof f.id === 'string' &&
+            f.id.length <= 100 &&
             typeof f.expression === 'string' &&
+            f.expression.length <= 200 &&
             typeof f.label === 'string' &&
+            f.label.length <= 100 &&
             typeof f.category === 'string' &&
+            f.category.length <= 100 &&
             typeof f.createdAt === 'number',
         )
         if (valid.length === 0) throw new Error('No valid favorites found')
