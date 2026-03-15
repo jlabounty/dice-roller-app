@@ -29,7 +29,7 @@ const KEYS: KeyDef[] = [
 
 function TooltipKey({ def }: { def: KeyDef }) {
   const appendChar = useDiceStore((s) => s.appendChar)
-  const { visible, handlers, hide } = useTooltip()
+  const { visible, handlers, hide } = useTooltip(() => appendChar(def.token))
   const ref = useRef<HTMLButtonElement>(null)
 
   return (
@@ -40,8 +40,10 @@ function TooltipKey({ def }: { def: KeyDef }) {
         onMouseLeave={handlers.onMouseLeave}
         onPointerDown={(e) => {
           e.preventDefault()
-          appendChar(def.token)
-          hide()
+          if (e.pointerType !== 'touch') {
+            appendChar(def.token)
+            hide()
+          }
           handlers.onPointerDown(e)
         }}
         onPointerUp={handlers.onPointerUp}

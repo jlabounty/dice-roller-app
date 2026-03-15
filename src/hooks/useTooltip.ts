@@ -1,9 +1,10 @@
 import { useState, useRef, useCallback } from 'react'
 
-export function useTooltip(longPressDelay = 600) {
+export function useTooltip(onTap?: () => void, longPressDelay = 600) {
   const [visible, setVisible] = useState(false)
   const pressTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const dismissTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const longPressOccurred = useRef(false)
 
   const show = useCallback(() => {
     if (dismissTimer.current) clearTimeout(dismissTimer.current)
@@ -23,11 +24,18 @@ export function useTooltip(longPressDelay = 600) {
     onMouseLeave: hide,
     onPointerDown: (e: React.PointerEvent) => {
       if (e.pointerType === 'touch') {
-        pressTimer.current = setTimeout(show, longPressDelay)
+        longPressOccurred.current = false
+        pressTimer.current = setTimeout(() => {
+          longPressOccurred.current = true
+          show()
+        }, longPressDelay)
       }
     },
-    onPointerUp: () => {
+    onPointerUp: (e: React.PointerEvent) => {
       if (pressTimer.current) clearTimeout(pressTimer.current)
+      if (e.pointerType === 'touch' && !longPressOccurred.current) {
+        onTap?.()
+      }
     },
     onPointerCancel: hide,
   }
