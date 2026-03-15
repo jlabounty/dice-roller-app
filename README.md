@@ -11,7 +11,7 @@ A dice roller PWA for tabletop RPGs. Supports standard and advanced dice notatio
 - **Advanced modifiers**:
   - Keep/drop: `kh`, `kl`, `dh`, `dl`
   - Reroll: `r`, `ro`
-  - Exploding: `!`, `!!` (compound), `!p` (penetrating)
+  - Exploding: `!`, `!!` (compound), `!p` (penetrating), `!e` (escalating)
   - Minimum value: `f`
 - **Roll history** — timestamped log of past rolls, tap any to reload the expression
 - **Favorites** — save named rolls with categories, inline editing, JSON import/export
@@ -48,6 +48,7 @@ pnpm test       # run unit tests
 | `!` | Explode on max value |
 | `!!` | Compound explode |
 | `!p` | Penetrating explode |
+| `!e` | Escalating explode — on max, roll the next larger die (d4→d6→d8→d10→d12→d20→d%) |
 | `fN` | Minimum die value of N |
 | `dF` | Fudge die (−1, 0, +1) |
 
@@ -60,6 +61,7 @@ pnpm test       # run unit tests
 | Pathfinder — hero point | `2d20kh1` | Same keep-highest mechanic |
 | FATE Core | `4dF` | Four Fudge dice |
 | Savage Worlds | `1d6!` | Exploding die |
+| Escalating | `3d4!e` | Roll 3d4; each max escalates to d6, then d8, etc. |
 
 ## Tech stack
 
