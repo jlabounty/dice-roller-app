@@ -20,6 +20,8 @@ export interface ChainMember {
   text: string
   /** This member also triggered the next die in the chain (all except the last). */
   isSubTrigger: boolean
+  /** Die type label for escalating explode extra rolls (e.g. "d6", "d8"). */
+  dieLabel?: string
 }
 
 /**
@@ -67,6 +69,7 @@ function buildItems(g: DiceGroupResult): BreakdownItem[] {
         ...extras.map((extraIdx, i) => ({
           text: String(g.allRolls[extraIdx]),
           isSubTrigger: i < extras.length - 1,
+          dieLabel: g.escalatingDieTypes?.has(extraIdx) ? dieLabel(g.escalatingDieTypes.get(extraIdx)!) : undefined,
         })),
       ]
       items.push({ kind: 'chain', dropped, members })

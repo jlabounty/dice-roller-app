@@ -24,6 +24,7 @@ const KEYS: KeyDef[] = [
   { label: 'r',  token: 'r',  title: 'Reroll (lowercase alias)', example: '2d6r1' },
   { label: '!!', token: '!!', title: 'Compound Explode — extra rolls accumulate on the same die', example: '2d6!!' },
   { label: '!p', token: '!p', title: 'Penetrating Explode — explode but subtract 1 from each extra roll', example: '2d6!p' },
+  { label: '!e', token: '!e', title: 'Escalating Explode — on max, roll the next larger die (d4→d6→d8…)', example: '3d4!e' },
   { label: 'f',  token: 'f',  title: 'Minimum (floor) — treat any roll below N as N', example: '4d6f2' },
 ]
 

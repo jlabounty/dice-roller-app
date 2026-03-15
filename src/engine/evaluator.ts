@@ -10,6 +10,29 @@ import type {
 const MAX_EXPLODE = 100
 const MAX_REROLL = 100
 
+// Standard die chain for escalating explode: each die escalates to the next larger
+const ESCALATING_CHAIN: DieType[] = [
+  { kind: 'numeric', sides: 2 },
+  { kind: 'numeric', sides: 4 },
+  { kind: 'numeric', sides: 6 },
+  { kind: 'numeric', sides: 8 },
+  { kind: 'numeric', sides: 10 },
+  { kind: 'numeric', sides: 12 },
+  { kind: 'numeric', sides: 20 },
+  { kind: 'percentile' },
+]
+
+function nextEscalateDie(dieType: DieType): DieType {
+  if (dieType.kind === 'fudge' || dieType.kind === 'percentile') return dieType
+  // Find the first chain entry with more sides than the current die
+  const next = ESCALATING_CHAIN.find((d) =>
+    d.kind === 'percentile'
+      ? dieType.sides < 100
+      : d.kind === 'numeric' && d.sides > dieType.sides,
+  )
+  return next ?? dieType // already at max, stay put
+}
+
 export type RandomFn = () => number
 
 function rollDie(dieType: DieType, random: RandomFn): number {
@@ -66,8 +89,10 @@ function rollGroup(
   const compoundExplodedIndices = new Set<number>()
 
   const explodeMod = modifiers.find(
-    (m) => m.type === 'explode' || m.type === 'explodeCompound' || m.type === 'explodePenetrating',
-  ) as Extract<DiceModifier, { type: 'explode' | 'explodeCompound' | 'explodePenetrating' }> | undefined
+    (m) => m.type === 'explode' || m.type === 'explodeCompound' || m.type === 'explodePenetrating' || m.type === 'explodeEscalating',
+  ) as Extract<DiceModifier, { type: 'explode' | 'explodeCompound' | 'explodePenetrating' | 'explodeEscalating' }> | undefined
+
+  const escalatingDieTypes: Map<number, DieType> = new Map()
 
   if (explodeMod) {
     const max = maxSides(dieType)
@@ -84,6 +109,24 @@ function rollGroup(
         }
         if (accumulated !== baseRolls[i]) compoundExplodedIndices.add(i)
         allRolls[i] = accumulated
+      }
+    } else if (explodeMod.type === 'explodeEscalating') {
+      // On max, roll the next larger die instead of the same die
+      for (let i = 0; i < baseRolls.length; i++) {
+        let prev = baseRolls[i]
+        let currentDie = dieType
+        let attempts = 0
+        while (prev === maxSides(currentDie) && attempts < MAX_EXPLODE) {
+          currentDie = nextEscalateDie(currentDie)
+          const extra = rollDie(currentDie, random)
+          const extraIdx = allRolls.length
+          allRolls.push(extra)
+          escalatingDieTypes.set(extraIdx, currentDie)
+          if (!explodeChains.has(i)) explodeChains.set(i, [])
+          explodeChains.get(i)!.push(extraIdx)
+          prev = extra
+          attempts++
+        }
       }
     } else {
       // explode / explodePenetrating: add extra dice as new entries, grouped per trigger
@@ -154,7 +197,7 @@ function rollGroup(
     return droppedIndices.has(idx) ? sum : sum + v
   }, 0)
 
-  return { dieType, allRolls: finalRolls, droppedIndices, explodeChains, compoundExplodedIndices, subtotal }
+  return { dieType, allRolls: finalRolls, droppedIndices, explodeChains, compoundExplodedIndices, escalatingDieTypes: escalatingDieTypes.size > 0 ? escalatingDieTypes : undefined, subtotal }
 }
 
 function evalExpr(

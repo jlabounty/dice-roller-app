@@ -15,6 +15,7 @@ export type Token =
   | { type: 'reroll' }                  // r / R
   | { type: 'explodeCompound' }         // !!
   | { type: 'explodePenetrating' }      // !p
+  | { type: 'explodeEscalating' }       // !e
   | { type: 'explode' }                 // !
   | { type: 'minValue' }                // f (floor / min value)
   | { type: 'lte' }                     // ≤ or <=
@@ -41,6 +42,7 @@ export function tokenize(input: string): Token[] {
     // Two-char operators (must check before single-char)
     if (s.slice(i, i + 2) === '!!') { tokens.push({ type: 'explodeCompound' }); i += 2; continue }
     if (s.slice(i, i + 2) === '!p') { tokens.push({ type: 'explodePenetrating' }); i += 2; continue }
+    if (s.slice(i, i + 2) === '!e') { tokens.push({ type: 'explodeEscalating' }); i += 2; continue }
     if (s.slice(i, i + 2) === '<=') { tokens.push({ type: 'lte' }); i += 2; continue }
     if (s.slice(i, i + 2) === '>=') { tokens.push({ type: 'gte' }); i += 2; continue }
 

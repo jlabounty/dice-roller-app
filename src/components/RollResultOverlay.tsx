@@ -60,6 +60,7 @@ export function RollResultOverlay() {
                       {item.members.map((m, mi) => (
                         <span key={mi}>
                           {mi > 0 && <span className="text-white/50"> </span>}
+                          {m.dieLabel && <span className="text-white/50">{m.dieLabel}:</span>}
                           {m.text}
                           {mi === 0
                             ? '🎆'                    /* triggering die */

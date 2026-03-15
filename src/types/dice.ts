@@ -17,6 +17,7 @@ export type DiceModifier =
   | { type: 'explode' }
   | { type: 'explodeCompound' }
   | { type: 'explodePenetrating' }
+  | { type: 'explodeEscalating' }
   | { type: 'minValue'; value: number }
 
 export type DiceExpression =
@@ -33,10 +34,15 @@ export interface DiceGroupResult {
   droppedIndices: Set<number>
   /**
    * Maps each trigger die index → ordered list of extra die indices it produced.
-   * Only set for explode / explodePenetrating (not compound).
+   * Only set for explode / explodePenetrating / explodeEscalating (not compound).
    * Within each array, all entries except the last also triggered further explosions.
    */
   explodeChains: Map<number, number[]>
+  /**
+   * Maps roll index → die type used for that roll.
+   * Only populated for explodeEscalating chains (extra dice use larger die types).
+   */
+  escalatingDieTypes?: Map<number, DieType>
   /** Indices of dice whose value was augmented by compound explode (!!). */
   compoundExplodedIndices: Set<number>
   /** Sum of kept dice */

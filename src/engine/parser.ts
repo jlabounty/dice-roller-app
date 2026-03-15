@@ -152,6 +152,11 @@ class Parser {
         modifiers.push({ type: 'explodePenetrating' })
         continue
       }
+      if (next.type === 'explodeEscalating') {
+        this.consume()
+        modifiers.push({ type: 'explodeEscalating' })
+        continue
+      }
       if (next.type === 'explode') {
         this.consume()
         modifiers.push({ type: 'explode' })
