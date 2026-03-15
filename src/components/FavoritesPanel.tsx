@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { useDiceStore } from '../store/diceStore'
 import type { Favorite } from '../types/dice'
 
@@ -38,8 +38,12 @@ export function FavoritesPanel({ onRolled }: Props) {
   const updateFavorite = useDiceStore((s) => s.updateFavorite)
   const rollFavorite = useDiceStore((s) => s.rollFavorite)
 
+  const importFavorites = useDiceStore((s) => s.importFavorites)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
   const [editState, setEditState] = useState<EditState | null>(null)
   const [collapsedCategories, setCollapsedCategories] = useState<Set<string>>(new Set())
+  const [importError, setImportError] = useState<string | null>(null)
 
   const grouped = groupByCategory(favorites)
 
@@ -66,11 +70,78 @@ export function FavoritesPanel({ onRolled }: Props) {
     onRolled?.()
   }
 
+  const handleExport = () => {
+    const json = JSON.stringify(favorites, null, 2)
+    const blob = new Blob([json], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = 'favorites.json'
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
+  const handleImport = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    e.target.value = ''
+    const reader = new FileReader()
+    reader.onload = (ev) => {
+      try {
+        const parsed = JSON.parse(ev.target?.result as string)
+        if (!Array.isArray(parsed)) throw new Error('Expected an array')
+        const valid = parsed.filter(
+          (f): f is Favorite =>
+            typeof f === 'object' &&
+            f !== null &&
+            typeof f.id === 'string' &&
+            typeof f.expression === 'string' &&
+            typeof f.label === 'string' &&
+            typeof f.category === 'string' &&
+            typeof f.createdAt === 'number',
+        )
+        if (valid.length === 0) throw new Error('No valid favorites found')
+        importFavorites(valid)
+        setImportError(null)
+      } catch (err) {
+        setImportError(err instanceof Error ? err.message : 'Invalid file')
+      }
+    }
+    reader.readAsText(file)
+  }
+
   return (
     <div className="flex flex-col h-full">
-      <div className="flex items-center px-3 py-2 bg-surface-mid shrink-0">
-        <h2 className="text-white font-semibold text-base">Favorites</h2>
+      <div className="flex items-center px-3 py-2 bg-surface-mid shrink-0 gap-2">
+        <h2 className="text-white font-semibold text-base flex-1">Favorites</h2>
+        <button
+          onPointerDown={handleExport}
+          disabled={favorites.length === 0}
+          className="text-white/40 text-xs px-2 py-1 rounded border border-white/15 active:bg-white/10 disabled:opacity-30 no-select"
+          aria-label="Export favorites"
+        >
+          Export
+        </button>
+        <button
+          onPointerDown={() => fileInputRef.current?.click()}
+          className="text-white/40 text-xs px-2 py-1 rounded border border-white/15 active:bg-white/10 no-select"
+          aria-label="Import favorites"
+        >
+          Import
+        </button>
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept=".json,application/json"
+          className="hidden"
+          onChange={handleImport}
+        />
       </div>
+      {importError && (
+        <div className="px-3 py-1.5 bg-red-900/40 text-red-300 text-xs shrink-0">
+          Import failed: {importError}
+        </div>
+      )}
 
       <div className="flex-1 overflow-y-auto">
         {favorites.length === 0 ? (

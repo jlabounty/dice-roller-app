@@ -61,6 +61,7 @@ interface DiceStore {
   removeFavorite: (id: string) => void
   isFavorite: (expression: string) => boolean
   rollFavorite: (id: string) => void
+  importFavorites: (incoming: Favorite[]) => void
   deleteHistoryEntry: (id: string) => void
   clearHistory: () => void
 }
@@ -159,6 +160,14 @@ export const useDiceStore = create<DiceStore>()(
           rollResult: result,
           showResult: true,
           history: newHistory,
+        })
+      },
+
+      importFavorites: (incoming) => {
+        set((s) => {
+          const existingIds = new Set(s.favorites.map((f) => f.id))
+          const toAdd = incoming.filter((f) => !existingIds.has(f.id))
+          return { favorites: [...s.favorites, ...toAdd] }
         })
       },
 
