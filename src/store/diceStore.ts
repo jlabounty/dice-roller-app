@@ -4,6 +4,8 @@ import { parse } from '../engine/parser'
 import { evaluate } from '../engine/evaluator'
 import type { DieType, RollResult, Favorite } from '../types/dice'
 
+const MAX_FORMULA_LENGTH = 200
+
 function dieToken(dieType: DieType): string {
   if (dieType.kind === 'fudge') return 'dF'
   if (dieType.kind === 'percentile') return 'd100'
@@ -21,7 +23,8 @@ function smartAppendDie(formula: string, dieType: DieType): string {
   if (!formula) return `1${token}`
 
   // If formula ends with the same die token, increment the count
-  const samePattern = new RegExp(`(\\d+)${token.replace('d', 'd')}$`)
+  const escapedToken = token.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  const samePattern = new RegExp(`(\\d+)${escapedToken}$`)
   const match = formula.match(samePattern)
   if (match) {
     const newCount = parseInt(match[1], 10) + 1
@@ -85,10 +88,12 @@ export const useDiceStore = create<DiceStore>()(
 
       appendDie: (dieType) => {
         const newFormula = smartAppendDie(get().formula, dieType)
+        if (newFormula.length > MAX_FORMULA_LENGTH) return
         set({ formula: newFormula, parseError: validateFormula(newFormula) })
       },
 
       appendChar: (ch) => {
+        if (get().formula.length >= MAX_FORMULA_LENGTH) return
         const newFormula = get().formula + ch
         set({ formula: newFormula, parseError: validateFormula(newFormula) })
       },

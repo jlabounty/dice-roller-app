@@ -21,6 +21,8 @@ export type Token =
 
 export class LexError extends Error {}
 
+const MAX_NUMBER = 10_000
+
 export function tokenize(input: string): Token[] {
   const tokens: Token[] = []
   let i = 0
@@ -78,6 +80,7 @@ export function tokenize(input: string): Token[] {
         throw new LexError(`Expected number after 'd' at position ${i}`)
       }
       const sides = parseInt(numStr, 10)
+      if (sides > MAX_NUMBER) throw new LexError(`Die sides too large (max ${MAX_NUMBER})`)
       if (sides === 100) {
         tokens.push({ type: 'dpercentile' })
       } else {
@@ -94,7 +97,9 @@ export function tokenize(input: string): Token[] {
     if (s[i] >= '0' && s[i] <= '9') {
       let numStr = ''
       while (i < s.length && s[i] >= '0' && s[i] <= '9') { numStr += s[i++] }
-      tokens.push({ type: 'number', value: parseInt(numStr, 10) })
+      const value = parseInt(numStr, 10)
+      if (value > MAX_NUMBER) throw new LexError(`Number too large (max ${MAX_NUMBER})`)
+      tokens.push({ type: 'number', value })
       continue
     }
 

@@ -85,6 +85,10 @@ export function FavoritesPanel({ onRolled }: Props) {
     const file = e.target.files?.[0]
     if (!file) return
     e.target.value = ''
+    if (file.size > 1_000_000) {
+      setImportError('File too large (max 1 MB)')
+      return
+    }
     const reader = new FileReader()
     reader.onload = (ev) => {
       try {

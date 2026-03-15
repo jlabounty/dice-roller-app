@@ -22,13 +22,13 @@ export function SaveFavoriteModal() {
   )
 
   useEffect(() => {
-    if (pendingSaveFavorite) {
-      setLabel('')
-      setCategory('')
-      setShowCategorySuggestions(false)
-      // Focus label input after render
-      setTimeout(() => labelRef.current?.focus(), 50)
-    }
+    if (!pendingSaveFavorite) return
+    setLabel('')
+    setCategory('')
+    setShowCategorySuggestions(false)
+    // Focus label input after render
+    const timer = setTimeout(() => labelRef.current?.focus(), 50)
+    return () => clearTimeout(timer)
   }, [pendingSaveFavorite])
 
   if (!pendingSaveFavorite) return null
