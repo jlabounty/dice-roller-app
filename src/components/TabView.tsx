@@ -3,13 +3,15 @@ import { DiceBagScreen } from './DiceBagScreen'
 import { HistoryPanel } from './HistoryPanel'
 import { FavoritesPanel } from './FavoritesPanel'
 import { HelpScreen } from './HelpScreen'
+import { SimulationPanel } from './SimulationPanel'
 
-type Tab = 'bag' | 'history' | 'favorites' | 'help'
+type Tab = 'bag' | 'history' | 'favorites' | 'stats' | 'help'
 
 const TABS: { id: Tab; label: string; icon: string }[] = [
   { id: 'history',   label: 'History',   icon: '🕐' },
   { id: 'bag',       label: 'Dice Bag',  icon: '🎲' },
   { id: 'favorites', label: 'Favorites', icon: '♥' },
+  { id: 'stats',     label: 'Stats',     icon: '📊' },
   { id: 'help',      label: 'Help',      icon: '?' },
 ]
 
@@ -28,6 +30,9 @@ export function TabView() {
         </div>
         <div className={activeTab === 'favorites' ? 'h-full' : 'hidden h-full'}>
           <FavoritesPanel onRolled={() => setActiveTab('bag')} />
+        </div>
+        <div className={activeTab === 'stats'     ? 'h-full' : 'hidden h-full'}>
+          <SimulationPanel />
         </div>
         <div className={activeTab === 'help'      ? 'h-full' : 'hidden h-full'}>
           <HelpScreen onExampleClick={() => setActiveTab('bag')} />

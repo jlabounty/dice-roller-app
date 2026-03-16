@@ -3,8 +3,9 @@ import { DiceBagScreen } from './DiceBagScreen'
 import { HistoryPanel } from './HistoryPanel'
 import { FavoritesPanel } from './FavoritesPanel'
 import { HelpScreen } from './HelpScreen'
+import { SimulationPanel } from './SimulationPanel'
 
-type RightPanel = 'favorites' | 'help'
+type RightPanel = 'favorites' | 'stats' | 'help'
 
 export function TabletLayout() {
   const [rightPanel, setRightPanel] = useState<RightPanel>('favorites')
@@ -25,7 +26,7 @@ export function TabletLayout() {
       <div className="w-72 border-l border-white/10 flex flex-col overflow-hidden shrink-0">
         {/* Panel switcher tabs */}
         <div className="flex bg-surface-mid border-b border-white/10 shrink-0">
-          {(['favorites', 'help'] as RightPanel[]).map((p) => (
+          {(['favorites', 'stats', 'help'] as RightPanel[]).map((p) => (
             <button
               key={p}
               onPointerDown={() => setRightPanel(p)}
@@ -33,7 +34,7 @@ export function TabletLayout() {
                 rightPanel === p ? 'text-[#E65100] border-b-2 border-[#E65100]' : 'text-white/40'
               }`}
             >
-              {p === 'help' ? '? Help' : '♥ Favorites'}
+              {p === 'help' ? '? Help' : p === 'stats' ? '📊 Stats' : '♥ Favorites'}
             </button>
           ))}
         </div>
@@ -41,6 +42,8 @@ export function TabletLayout() {
         <div className="flex-1 overflow-hidden">
           {rightPanel === 'favorites' ? (
             <FavoritesPanel />
+          ) : rightPanel === 'stats' ? (
+            <SimulationPanel />
           ) : (
             <HelpScreen />
           )}
