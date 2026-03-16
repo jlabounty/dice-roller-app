@@ -60,7 +60,7 @@ interface DiceStore {
   openSaveFavorite: (expression: string) => void
   closeSaveFavorite: () => void
   addFavorite: (expression: string, label: string, category: string) => void
-  updateFavorite: (id: string, patch: Partial<Pick<Favorite, 'label' | 'category'>>) => void
+  updateFavorite: (id: string, patch: Partial<Pick<Favorite, 'label' | 'category' | 'expression'>>) => void
   removeFavorite: (id: string) => void
   isFavorite: (expression: string) => boolean
   rollFavorite: (id: string) => void

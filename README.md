@@ -15,6 +15,7 @@ A dice roller PWA for tabletop RPGs. Supports standard and advanced dice notatio
   - Minimum value: `f`
 - **Roll history** — timestamped log of past rolls, tap any to reload the expression
 - **Favorites** — save named rolls with categories, inline editing, JSON import/export
+- **Statistics** — Monte Carlo simulation (100–100,000 trials) with mean, median, std dev, min/max, and a frequency histogram
 - **Visual result overlay** — full breakdown of individual dice, dropped dice, and explosion chains
 - **Offline support** — installable PWA with service worker caching
 
@@ -22,7 +23,7 @@ A dice roller PWA for tabletop RPGs. Supports standard and advanced dice notatio
 
 | Phone | Tablet (768px+) |
 |-------|-----------------|
-| Bottom tab nav (History / Dice Bag / Favorites / Help) | 3-panel layout (History · Dice Bag · Favorites/Help) |
+| Bottom tab nav (History / Dice Bag / Favorites / Stats / Help) | 3-panel layout (History · Dice Bag · Favorites/Stats/Help) |
 
 ## Getting started
 
@@ -43,8 +44,8 @@ pnpm test       # run unit tests
 | `NdX` | Roll N dice with X sides |
 | `kh N` / `kl N` | Keep highest / lowest N |
 | `dh N` / `dl N` | Drop highest / lowest N |
-| `r<N` | Reroll dice below N |
-| `ro=N` | Reroll once if equal to N |
+| `r<N` / `r>N` / `r=N` | Reroll dice below / above / equal to N |
+| `ro<N` / `ro>N` / `ro=N` | Reroll once below / above / equal to N |
 | `!` | Explode on max value |
 | `!!` | Compound explode |
 | `!p` | Penetrating explode |
@@ -71,6 +72,15 @@ pnpm test       # run unit tests
 - **Zustand** for state management (with localStorage persistence)
 - **vite-plugin-pwa** + **Workbox** for PWA/service worker
 - **Vitest** for unit tests (lexer, parser, evaluator)
+
+## Inspiration & attribution
+
+This project was created as a test case to explore how Claude Code works, and as a personal tool for tabletop gaming.
+
+It was inspired by two excellent dice tools:
+
+- **[CritDice](http://www.critdice.com/)** by Reddit user [vuesoft](https://www.reddit.com/user/vuesoft/) — a clean, fast dice roller that sadly no longer exists online.
+- **[AnyDice](https://anydice.com/)** by [Catlike Coding](https://ko-fi.com/catlikecoding) — a powerful dice probability calculator.
 
 ## Architecture
 

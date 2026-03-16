@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react'
+import { parse } from '../engine/parser'
 import { useDiceStore } from '../store/diceStore'
 import type { Favorite } from '../types/dice'
 
@@ -30,6 +31,7 @@ interface EditState {
   id: string
   label: string
   category: string
+  expression: string
 }
 
 export function FavoritesPanel({ onRolled }: Props) {
@@ -42,6 +44,7 @@ export function FavoritesPanel({ onRolled }: Props) {
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const [editState, setEditState] = useState<EditState | null>(null)
+  const [expressionError, setExpressionError] = useState<string | null>(null)
   const [collapsedCategories, setCollapsedCategories] = useState<Set<string>>(new Set())
   const [importError, setImportError] = useState<string | null>(null)
 
@@ -56,12 +59,19 @@ export function FavoritesPanel({ onRolled }: Props) {
   }
 
   const startEdit = (fav: Favorite) => {
-    setEditState({ id: fav.id, label: fav.label, category: fav.category })
+    setExpressionError(null)
+    setEditState({ id: fav.id, label: fav.label, category: fav.category, expression: fav.expression })
   }
 
   const commitEdit = () => {
     if (!editState) return
-    updateFavorite(editState.id, { label: editState.label, category: editState.category })
+    const result = parse(editState.expression)
+    if (!result.ok) {
+      setExpressionError(result.error)
+      return
+    }
+    updateFavorite(editState.id, { label: editState.label, category: editState.category, expression: editState.expression })
+    setExpressionError(null)
     setEditState(null)
   }
 
@@ -186,6 +196,16 @@ export function FavoritesPanel({ onRolled }: Props) {
                         className="bg-surface rounded px-2 py-1 text-white text-sm outline-none focus:ring-1 focus:ring-[#E65100] placeholder:text-white/25"
                         autoFocus
                       />
+                      <input
+                        type="text"
+                        value={editState.expression}
+                        onChange={(e) => { setExpressionError(null); setEditState({ ...editState, expression: e.target.value }) }}
+                        placeholder="Formula"
+                        className={`bg-surface rounded px-2 py-1 text-white font-mono text-sm outline-none focus:ring-1 placeholder:text-white/25 ${expressionError ? 'ring-1 ring-red-500 focus:ring-red-500' : 'focus:ring-[#E65100]'}`}
+                      />
+                      {expressionError && (
+                        <p className="text-red-400 text-xs px-1">{expressionError}</p>
+                      )}
                       <input
                         type="text"
                         value={editState.category}
