@@ -54,6 +54,8 @@ function maxSides(dieType: DieType): number {
 
 function matchesCondition(value: number, cond: CompareCondition): boolean {
   if (cond.op === 'eq') return value === cond.value
+  if (cond.op === 'lt') return value < cond.value
+  if (cond.op === 'gt') return value > cond.value
   if (cond.op === 'lte') return value <= cond.value
   return value >= cond.value
 }

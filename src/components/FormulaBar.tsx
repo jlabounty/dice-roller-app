@@ -1,4 +1,16 @@
+import type { ReactNode } from 'react'
 import { useDiceStore } from '../store/diceStore'
+
+/** Renders the formula string, highlighting any `dN` placeholder `N` with an amber badge. */
+function renderFormula(formula: string): ReactNode {
+  if (!formula.includes('dN')) return formula
+  const parts = formula.split(/(dN)/g)
+  return parts.map((part, i) =>
+    part === 'dN'
+      ? <span key={i}>d<span className="bg-amber-400 text-black px-0.5 rounded-sm leading-none">N</span></span>
+      : part,
+  )
+}
 
 export function FormulaBar() {
   const formula = useDiceStore((s) => s.formula)
@@ -9,7 +21,7 @@ export function FormulaBar() {
     <div className="bg-surface-mid px-3 py-2 flex flex-col gap-1">
       <div className="flex items-center gap-2">
         <div className="flex-1 font-mono text-2xl text-white min-h-[2rem] tracking-wide truncate">
-          {formula || <span className="text-white/30 text-lg">tap dice to build a roll…</span>}
+          {formula ? renderFormula(formula) : <span className="text-white/30 text-lg">tap dice to build a roll…</span>}
         </div>
         <button
           onPointerDown={(e) => { e.preventDefault(); backspace() }}

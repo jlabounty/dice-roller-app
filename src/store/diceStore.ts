@@ -94,7 +94,11 @@ export const useDiceStore = create<DiceStore>()(
 
       appendChar: (ch) => {
         if (get().formula.length >= MAX_FORMULA_LENGTH) return
-        const newFormula = get().formula + ch
+        const f = get().formula
+        // If formula ends with the dN placeholder and user types a digit, replace N instead of appending
+        const newFormula = /dN$/.test(f) && /^\d$/.test(ch)
+          ? f.slice(0, -1) + ch
+          : f + ch
         set({ formula: newFormula, parseError: validateFormula(newFormula) })
       },
 

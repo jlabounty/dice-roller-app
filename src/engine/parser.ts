@@ -3,6 +3,17 @@ import type { DiceExpression, DiceModifier, DieType, CompareCondition } from '..
 
 export class ParseError extends Error {}
 
+function tokenDisplay(type: Token['type'] | string): string {
+  const map: Partial<Record<Token['type'], string>> = {
+    lt: '<', gt: '>', eq: '=',
+    lte: '≤', gte: '≥',
+    plus: '+', minus: '-',
+    lparen: '(', rparen: ')',
+    eof: 'end of input',
+  }
+  return map[type as Token['type']] ?? type
+}
+
 class Parser {
   private tokens: Token[]
   private pos = 0
@@ -16,14 +27,14 @@ class Parser {
 
   private expect(type: Token['type']): Token {
     const t = this.peek()
-    if (t.type !== type) throw new ParseError(`Expected ${type} but got ${t.type}`)
+    if (t.type !== type) throw new ParseError(`Expected ${tokenDisplay(type)} but got ${tokenDisplay(t.type)}`)
     return this.consume()
   }
 
   parse(): DiceExpression {
     const expr = this.parseExpression()
     if (this.peek().type !== 'eof') {
-      throw new ParseError(`Unexpected token: ${this.peek().type}`)
+      throw new ParseError(`Unexpected token: ${tokenDisplay(this.peek().type)}`)
     }
     return expr
   }
@@ -77,7 +88,7 @@ class Parser {
       return { kind: 'constant', value: -numTok.value }
     }
 
-    throw new ParseError(`Unexpected token: ${t.type}`)
+    throw new ParseError(`Unexpected token: ${tokenDisplay(t.type)}`)
   }
 
   private parseDiceGroup(count: number): DiceExpression {
@@ -103,7 +114,12 @@ class Parser {
         next.type === 'die' ||
         next.type === 'dfudge' ||
         next.type === 'dpercentile' ||
-        next.type === 'rparen'
+        next.type === 'rparen' ||
+        next.type === 'lt' ||
+        next.type === 'gt' ||
+        next.type === 'eq' ||
+        next.type === 'lte' ||
+        next.type === 'gte'
       ) break
 
       if (next.type === 'keepHighest') {
@@ -187,7 +203,22 @@ class Parser {
       const n = this.expect('number') as Extract<Token, { type: 'number' }>
       return { op: 'gte', value: n.value }
     }
-    // Default: equals the number
+    if (t.type === 'lt') {
+      this.consume()
+      const n = this.expect('number') as Extract<Token, { type: 'number' }>
+      return { op: 'lt', value: n.value }
+    }
+    if (t.type === 'gt') {
+      this.consume()
+      const n = this.expect('number') as Extract<Token, { type: 'number' }>
+      return { op: 'gt', value: n.value }
+    }
+    if (t.type === 'eq') {
+      this.consume()
+      const n = this.expect('number') as Extract<Token, { type: 'number' }>
+      return { op: 'eq', value: n.value }
+    }
+    // Default: equals the number (no explicit op)
     const n = this.expect('number') as Extract<Token, { type: 'number' }>
     return { op: 'eq', value: n.value }
   }

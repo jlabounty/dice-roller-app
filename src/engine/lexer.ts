@@ -20,6 +20,9 @@ export type Token =
   | { type: 'minValue' }                // f (floor / min value)
   | { type: 'lte' }                     // ≤ or <=
   | { type: 'gte' }                     // ≥ or >=
+  | { type: 'lt' }                      // <
+  | { type: 'gt' }                      // >
+  | { type: 'eq' }                      // =
   | { type: 'eof' }
 
 export class LexError extends Error {}
@@ -45,6 +48,9 @@ export function tokenize(input: string): Token[] {
     if (s.slice(i, i + 2) === '!e') { tokens.push({ type: 'explodeEscalating' }); i += 2; continue }
     if (s.slice(i, i + 2) === '<=') { tokens.push({ type: 'lte' }); i += 2; continue }
     if (s.slice(i, i + 2) === '>=') { tokens.push({ type: 'gte' }); i += 2; continue }
+    if (s[i] === '<') { tokens.push({ type: 'lt' }); i++; continue }
+    if (s[i] === '>') { tokens.push({ type: 'gt' }); i++; continue }
+    if (s[i] === '=') { tokens.push({ type: 'eq' }); i++; continue }
 
     // Case-insensitive two-char modifiers: kh, kl, dh, dl, ro
     const twoLower = s.slice(i, i + 2).toLowerCase()

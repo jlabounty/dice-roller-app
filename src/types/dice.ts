@@ -5,6 +5,8 @@ export type DieType =
 
 export type CompareCondition =
   | { op: 'eq'; value: number }
+  | { op: 'lt'; value: number }
+  | { op: 'gt'; value: number }
   | { op: 'lte'; value: number }
   | { op: 'gte'; value: number }
 

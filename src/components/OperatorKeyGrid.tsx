@@ -21,11 +21,14 @@ const KEYS: KeyDef[] = [
   // Row 2
   { label: '(',  token: '(',  title: 'Open parenthesis — group parts of your formula', example: '(2d6+3)+1d4' },
   { label: ')',  token: ')',  title: 'Close parenthesis — end a group', example: '(2d6+3)+1d4' },
-  { label: 'r',  token: 'r',  title: 'Reroll (lowercase alias)', example: '2d6r1' },
   { label: '!!', token: '!!', title: 'Compound Explode — extra rolls accumulate on the same die', example: '2d6!!' },
   { label: '!p', token: '!p', title: 'Penetrating Explode — explode but subtract 1 from each extra roll', example: '2d6!p' },
   { label: '!e', token: '!e', title: 'Escalating Explode — on max, roll the next larger die (d4→d6→d8…)', example: '3d4!e' },
   { label: 'f',  token: 'f',  title: 'Minimum (floor) — treat any roll below N as N', example: '4d6f2' },
+  // Row 3
+  { label: '<',  token: '<',  title: 'Less than — use after r or f', example: '4d6r<3' },
+  { label: '=',  token: '=',  title: 'Equal — use after r or f', example: '2d6r=1' },
+  { label: '>',  token: '>',  title: 'Greater than — use after r or f', example: '2d6r>4' },
 ]
 
 function TooltipKey({ def }: { def: KeyDef }) {
@@ -66,6 +69,7 @@ function TooltipKey({ def }: { def: KeyDef }) {
 export function OperatorKeyGrid() {
   const row1 = KEYS.slice(0, 6)
   const row2 = KEYS.slice(6, 12)
+  const row3 = KEYS.slice(12)
 
   return (
     <div className="flex flex-col gap-1 px-1">
@@ -74,6 +78,9 @@ export function OperatorKeyGrid() {
       </div>
       <div className="grid grid-cols-6 gap-1">
         {row2.map((def) => <TooltipKey key={def.label + '2'} def={def} />)}
+      </div>
+      <div className="grid grid-cols-3 gap-1">
+        {row3.map((def) => <TooltipKey key={def.label + '3'} def={def} />)}
       </div>
     </div>
   )
